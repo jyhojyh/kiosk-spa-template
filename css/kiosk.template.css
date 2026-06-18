@@ -1,0 +1,151 @@
+/* ==========================================================================
+   kiosk.template.css — Reusable SPA transition + slide menu + idle bar
+
+   Requirements (HTML):
+   - SPA pages: <section id="page-{id}" class="spa-page">...</section>
+   - Slide menu (optional):
+       #slide-menu, #slide-menu-backdrop, #slide-menu-close
+       .slide-menu-item[data-page="{id}"]
+   - Idle bar (optional): #idle-bar
+
+   Notes:
+   - This file contains only the "system" styles needed by the template router.
+   - Project-specific UI styles should live in a separate file (e.g. style.css).
+   ========================================================================== */
+
+/* Viewport container */
+html, body { height: 100%; }
+body {
+  position: relative;
+  width: 1080px;
+  max-width: 100%;
+  height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+  touch-action: pan-x pan-y;
+  overflow: hidden; /* prevent body scroll; pages scroll internally */
+}
+
+#spa-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Pages */
+.spa-page {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(60px);
+  transition: opacity 260ms ease, transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.spa-page.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.spa-page.is-leaving-right {
+  opacity: 0;
+  transform: translateX(60px);
+  pointer-events: none;
+}
+
+.spa-page.is-leaving-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  pointer-events: none;
+}
+
+.spa-page.is-entering-back {
+  transform: translateX(-60px);
+}
+
+/* Slide menu (optional) */
+.slide-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 640px;
+  height: 100%;
+  background-color: #0d0d0d;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 9000;
+  transition: right 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 260px 90px 0;
+  border-top-left-radius: 50px;
+}
+.slide-menu.is-open { right: 0; }
+
+.slide-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 8999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+.slide-menu-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+.slide-menu-close {
+  position: absolute;
+  top: 120px;
+  right: 100px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #c0392b;
+}
+
+.slide-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 30px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.56);
+  cursor: pointer;
+  text-decoration: none;
+}
+.slide-menu-item .label { font-size: 32px; font-weight: 500; color: #fff; }
+.slide-menu-item .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  margin-left: auto;
+}
+.slide-menu-item.active .dot { background: #c0392b; }
+
+/* Idle bar (optional) */
+#idle-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(1);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: #2d6ef7;
+}
+

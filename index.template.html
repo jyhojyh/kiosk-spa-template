@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Kiosk SPA Template</title>
+
+  <!-- Project UI styles (optional) -->
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/font.css">
+
+  <!-- Template system CSS (required) -->
+  <link rel="stylesheet" href="./css/kiosk.template.css">
+
+  <!-- Your project styles (recommended) -->
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <div id="spa-root">
+    <!--
+      IMPORTANT:
+      - page sections must follow: id="page-{id}" and class="spa-page"
+      - {id} must exist in CONFIG.pages in js/app.js (or js/app.template.js)
+    -->
+
+    <!-- PAGE: main -->
+    <section id="page-main" class="spa-page" aria-label="메인">
+      <div style="padding:80px;">
+        <h1>메인</h1>
+        <p>data-navigate 예시</p>
+        <button type="button" data-navigate="hub">둘러보기(허브로)</button>
+      </div>
+    </section>
+
+    <!-- PAGE: hub -->
+    <section id="page-hub" class="spa-page" aria-label="허브">
+      <div style="padding:80px;">
+        <h2>허브</h2>
+        <p>이 페이지는 보통 “회사소개/제조과정/제품” 진입 메뉴 화면입니다.</p>
+
+        <div style="display:flex; gap:16px; margin-top:24px;">
+          <button type="button" data-navigate="company">회사소개</button>
+          <button type="button" data-navigate="process">제조과정</button>
+          <button type="button" data-navigate="products">제품</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE: company -->
+    <section id="page-company" class="spa-page" aria-label="회사소개">
+      <header style="padding:40px 80px; display:flex; gap:12px; align-items:center;">
+        <button type="button" data-back aria-label="뒤로가기">←</button>
+        <div style="flex:1; font-weight:700;">회사소개</div>
+        <button type="button" class="sn-menu" aria-label="메뉴 열기">≡</button>
+      </header>
+      <div style="padding:40px 80px;">
+        <p>회사소개 콘텐츠</p>
+      </div>
+    </section>
+
+    <!-- PAGE: process (Swiper example placeholder) -->
+    <section id="page-process" class="spa-page" aria-label="제조과정">
+      <header style="padding:40px 80px; display:flex; gap:12px; align-items:center;">
+        <button type="button" data-back aria-label="뒤로가기">←</button>
+        <div style="flex:1; font-weight:700;">제조과정</div>
+        <button type="button" class="sn-menu" aria-label="메뉴 열기">≡</button>
+      </header>
+
+      <div style="padding:40px 80px;">
+        <p>이 영역은 ROUTES.process.render()에서 Swiper 슬라이드를 주입하는 예시입니다.</p>
+        <div class="swiper sn-process-swiper" style="margin-top:24px;">
+          <div class="swiper-wrapper" id="process-swiper-wrapper"></div>
+          <div class="swiper-pagination sn-process-pagination"></div>
+        </div>
+        <button class="sn-nav sn-nav-prev" type="button" aria-label="이전">Prev</button>
+        <button class="sn-nav sn-nav-next" type="button" aria-label="다음">Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE: products -->
+    <section id="page-products" class="spa-page" aria-label="제품">
+      <header style="padding:40px 80px; display:flex; gap:12px; align-items:center;">
+        <button type="button" data-back aria-label="뒤로가기">←</button>
+        <div style="flex:1; font-weight:700;">제품</div>
+        <button type="button" class="sn-menu" aria-label="메뉴 열기">≡</button>
+      </header>
+
+      <div style="padding:40px 80px;">
+        <div id="products-grid"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Idle progress bar (optional) -->
+  <div id="idle-bar" aria-hidden="true"></div>
+
+  <!-- Slide menu (optional) -->
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <nav id="slide-menu" class="slide-menu" aria-label="전체 메뉴">
+    <div id="slide-menu-close" class="slide-menu-close" role="button" tabindex="0" aria-label="메뉴 닫기">
+      <span aria-hidden="true">×</span>
+    </div>
+
+    <a class="slide-menu-item" href="#" data-page="main"><span class="label">메인</span><span class="dot" aria-hidden="true"></span></a>
+    <a class="slide-menu-item" href="#" data-page="hub"><span class="label">허브</span><span class="dot" aria-hidden="true"></span></a>
+    <a class="slide-menu-item" href="#" data-page="company"><span class="label">회사소개</span><span class="dot" aria-hidden="true"></span></a>
+    <a class="slide-menu-item" href="#" data-page="process"><span class="label">제조과정</span><span class="dot" aria-hidden="true"></span></a>
+    <a class="slide-menu-item" href="#" data-page="products"><span class="label">제품</span><span class="dot" aria-hidden="true"></span></a>
+  </nav>
+
+  <!-- Libraries (optional) -->
+  <!-- If you use Swiper/GSAP, load before app.js -->
+  <!-- <script src="./js/swiper-bundle.min.js"></script> -->
+  <!-- <script src="./js/gsap.min.js"></script> -->
+
+  <!-- Template JS -->
+  <script src="./js/app.template.js"></script>
+</body>
+</html>
+

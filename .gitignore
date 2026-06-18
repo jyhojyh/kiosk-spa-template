@@ -1,0 +1,18 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temp / scratch
+.tmp/
+_scratch/
+
+# Local secrets (if any)
+.env
+.env.local
