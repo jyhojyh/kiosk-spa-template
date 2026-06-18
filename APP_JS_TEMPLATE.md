@@ -27,10 +27,13 @@
 
 - `js/app.template.js`: 재사용 가능한 템플릿 본체
 - `js/app.js`: 현재 프로젝트 전용 구현(그대로 유지)
-- `index.template.html`: 템플릿용 HTML 예시(필수 DOM 구조 포함)
+- `index.template.html`: **단일 파일 패턴** HTML 예시(모든 시안을 한 파일에)
+- `index.template.php` + `pages/*.php`: **멀티파일 패턴** PHP include 예시(시안마다 별도 파일)
 - `css/kiosk.template.css`: 템플릿용 시스템 CSS(SPA 전환/메뉴/idle)
 
 새 프로젝트에서는 보통 `js/app.template.js`를 복사해서 `js/app.js`로 사용합니다.
+
+**파일 분리 패턴 선택**: 시안이 5개 이내라면 `index.template.html`(단일 파일), 10개 이상이면 `index.template.php`(멀티파일) 권장. 자세한 내용은 9절 참고.
 
 ---
 
@@ -157,4 +160,76 @@ idle: {
 1. 데이터는 `window.PROCESS_STEPS`, `window.PRODUCTS` 또는 별도 `data.js`로 분리
 2. 페이지별 렌더는 `ROUTES.{pageId}.render`로 이동
 3. Swiper 초기화는 `ROUTES.{pageId}.onEnter`에서 `initSwiperOnce()` 호출
+
+---
+
+## 9) 멀티파일 패턴(PHP includes) — 시안이 많을 때
+
+키오스크 프로젝트는 보통 시안이 10~20개로 늘어나면서 `index.html` 한 파일이 수천 줄로 부풀어 작업이 불편해집니다. 이 경우 **PHP `include`로 시안 파일을 분리**하면 런타임 동작(SPA 전환·idle·뒤로가기)은 그대로 유지하면서 작업 파일만 잘게 쪼갤 수 있습니다.
+
+### 9-1) 구조
+
+```
+project/
+├── index.php                ← 진입 (shell + include 목록)
+├── pages/
+│   ├── main.php             ← <section id="page-main"> …
+│   ├── hub.php              ← <section id="page-hub"> …
+│   ├── company.php
+│   └── …
+├── css/
+└── js/
+```
+
+### 9-2) `index.php` 구조
+
+```php
+<!DOCTYPE html>
+<html lang="ko"><head>…</head>
+<body>
+  <div id="spa-root">
+<?php
+$pages = [
+  'pages/main.php',
+  'pages/hub.php',
+  'pages/company.php',
+  // 새 시안 추가 시 여기에 한 줄 추가
+];
+foreach ($pages as $p) { include __DIR__ . '/' . $p; }
+?>
+  </div>
+  <div id="idle-bar"></div>
+  <script src="./js/app.js"></script>
+</body>
+</html>
+```
+
+### 9-3) 시안 파일 예시 (`pages/main.php`)
+
+```php
+<?php /* page-main */ ?>
+<section id="page-main" class="spa-page" aria-label="메인">
+  …시안 마크업…
+</section>
+```
+
+### 9-4) 새 시안 추가 — 3 단계
+
+1. `pages/<id>.php` 파일 작성 — `<section id="page-{id}" class="spa-page">…</section>`
+2. `index.php` 의 `$pages` 배열에 한 줄 추가
+3. `js/app.js` 의 `CONFIG.pages` 에 `{id}` 등록
+
+### 9-5) 장단점 (단일 vs 멀티)
+
+| 항목 | 단일 HTML | 멀티 (PHP include) |
+|---|---|---|
+| 런타임 동작 | SPA 그대로 | SPA 그대로 (DOM 완전 동일) |
+| 파일 길이 | 한 파일에 누적, 길어짐 | 시안 파일 단위 짧음 |
+| 의존성 | 없음(정적 호스팅 가능) | PHP 필요 (XAMPP/Apache) |
+| Git diff | 한 파일 비대 | 시안별 diff 분리 |
+| 적정 시점 | 시안 5개 이내 | 시안 10개 이상 |
+
+### 9-6) 정적 호스팅으로 전환(필요 시)
+
+배포 환경이 PHP를 지원하지 않으면, 빌드 단계에서 `index.php`를 실행해 결과 HTML을 캡처(`php index.php > index.html`)하거나, Node.js로 동일한 include 합치기 스크립트를 작성해 빌드 산출물 하나의 `index.html`을 만들 수 있습니다. 개발은 멀티파일로, 배포는 단일 파일로 운영하는 방식입니다.
 
