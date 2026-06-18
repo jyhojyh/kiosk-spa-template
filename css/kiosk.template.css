@@ -20,8 +20,7 @@ body {
   width: 1080px;
   max-width: 100%;
   height: 100vh;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto; /* 브라우저 기본 8px margin 제거 + 가로 중앙정렬 */
   touch-action: pan-x pan-y;
   overflow: hidden; /* prevent body scroll; pages scroll internally */
 }
