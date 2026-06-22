@@ -202,8 +202,20 @@
 
     if (opts.instant) {
       // No slide animation — swap active state directly.
+      // `.spa-page` base rule has `transition: opacity/transform 260ms` so just toggling
+      // is-active would still fade+slide. Suppress the transition for this one swap,
+      // then restore on the next frame so subsequent navigations animate normally.
+      if (fromEl) fromEl.style.transition = "none";
+      toEl.style.transition = "none";
       if (fromEl) fromEl.classList.remove("is-active");
       toEl.classList.add("is-active");
+      // Force reflow so the class changes commit before transition is restored.
+      void toEl.offsetWidth;
+      if (fromEl) void fromEl.offsetWidth;
+      requestAnimationFrame(() => {
+        if (fromEl) fromEl.style.transition = "";
+        toEl.style.transition = "";
+      });
       isAnimating = false;
     } else {
       if (dir === "right") toEl.classList.add("is-entering-back");
