@@ -80,6 +80,9 @@
 
 **동작**:
 - 동일 속성으로 forward(`data-navigate`) 와 back(`data-back`) 양쪽 지원.
+- **forward instant 는 history 에 push 하지 않음** — in-place state change 로 간주.
+  - 예: A → B(instant) → C(instant) 흐름에서 C 의 `data-back` 클릭 시 A 로 직행 (B 를 건너뜀).
+  - 그래서 "in-place 변종 페이지에서 NMS 로 돌아가기" 같은 명시적 이동은 `data-back` 보다 `data-navigate="nms" data-no-anim` 이 더 안전 (history 영향 없이 항상 그 페이지로).
 - 직접 `navigate(pageId, dir, { instant: true })` 또는 `goBack({ instant: true })` 호출도 가능.
 
 ### 3-4) 슬라이드 메뉴(선택)

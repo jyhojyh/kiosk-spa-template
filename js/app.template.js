@@ -173,10 +173,11 @@
    * SPA page transition.
    * @param pageId target page id
    * @param dir    "left" (forward, default) | "right" (back)
-   * @param opts.instant  true → skip slide animation, swap pages immediately.
+   * @param opts.instant  true → skip slide animation, swap pages immediately, AND
+   *                       skip pushing to history (in-place state change).
    *                       Trigger via `data-no-anim` attribute on a [data-navigate] element.
-   *                       Useful for in-place state swaps (e.g. an alert variant of the same screen)
-   *                       where a slide transition would feel like leaving the current context.
+   *                       After a chain of instant swaps, goBack() lands on the last
+   *                       regular-nav page rather than walking through intermediate states.
    */
   function navigate(pageId, dir = "left", opts = {}) {
     if (isAnimating) return;
@@ -235,7 +236,10 @@
       }, CONFIG.transitionMs);
     }
 
-    if (dir === "left" && current) historyStack.push(current);
+    // Instant navigations are treated as in-place state changes — skip the history
+    // push so that goBack() from a chain of instant swaps lands on the last regular
+    // page (typically the entry point), not on intermediate states.
+    if (dir === "left" && current && !opts.instant) historyStack.push(current);
     current = pageId;
     updateMenuActive(pageId);
 
