@@ -392,6 +392,11 @@
    */
   function resetIdle() {
     if (!CONFIG.idle.enabled) return;
+    // Keep the idle timer paused while a modal is open. Without this guard, the
+    // capture-phase global listeners restart the timer on every touch — so a
+    // user idling inside an opened modal would still be dropped onto the idle
+    // page, with the modal left visible on top.
+    if (modalIdleSaved) return;
 
     clearTimeout(idleTimer);
     clearTimeout(warnTimer);
