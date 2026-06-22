@@ -246,10 +246,10 @@
     resetIdle();
   }
 
-  function goBack() {
+  function goBack(opts = {}) {
     if (!historyStack.length) return;
     const prev = historyStack.pop();
-    navigate(prev, "right");
+    navigate(prev, "right", opts);
   }
 
   /**
@@ -368,7 +368,9 @@
       const backEl = e.target.closest("[" + CONFIG.nav.backAttr + "]");
       if (backEl) {
         e.preventDefault();
-        goBack();
+        // `data-no-anim` works on both [data-navigate] and [data-back] triggers.
+        const instant = backEl.hasAttribute("data-no-anim");
+        goBack({ instant });
         return;
       }
 

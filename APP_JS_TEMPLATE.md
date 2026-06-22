@@ -12,8 +12,8 @@
 - **SPA 페이지 전환**: `section#page-{id}`를 `is-active` 클래스로 전환
 - **네비게이션**:
   - `data-navigate="pageId"` → 이동 (슬라이드 전환)
-  - `data-navigate="pageId" data-no-anim` → 슬라이드 없이 즉시 swap
   - `data-back` → 뒤로가기(내부 historyStack)
+  - 위 두 속성 모두 `data-no-anim` 함께 주면 슬라이드 없이 즉시 swap
 - **슬라이드 메뉴(옵션)**: 우측 메뉴 열기/닫기 + 메뉴에서 페이지 이동
 - **Idle Timer(옵션)**: 일정 시간 미사용 시 홈으로 복귀 + 진행바 표시
 - **페이지별 훅(라우트 맵)**:
@@ -60,23 +60,27 @@
 
 ### 3-3) 슬라이드 효과 없이 즉시 swap (옵션)
 
-`data-navigate` 트리거에 **`data-no-anim`** 속성을 함께 주면 슬라이드 애니메이션을 건너뛰고 페이지가 즉시 교체됩니다.
+`data-navigate` 또는 `data-back` 트리거에 **`data-no-anim`** 속성을 함께 주면 슬라이드 애니메이션을 건너뛰고 페이지가 즉시 교체됩니다.
 
 ```html
 <!-- 일반 — 슬라이드 전환 -->
 <button type="button" data-navigate="products">제품 목록</button>
 
-<!-- 슬라이드 없이 즉시 swap -->
+<!-- 슬라이드 없이 즉시 swap (forward) -->
 <button type="button" data-navigate="products-alert" data-no-anim>알람 보기</button>
+
+<!-- 돌아갈 때도 즉시 swap (back) -->
+<button type="button" data-back data-no-anim>닫기</button>
 ```
 
 **언제 쓰나**:
 - 같은 화면 컨텍스트의 변종 (예: 평상 상태 ↔ 알람 상태 헤더만 다른 페이지) — 슬라이드가 "다른 곳으로 이동" 느낌을 주면 혼란.
 - 동일 그리드/카드 영역을 공유하는 화면 간 즉시 전환 — 카드 위치가 그대로니까 슬라이드 없을 때 자연스러움.
+- 갈 때와 돌아올 때를 짝지어 모두 `data-no-anim` 으로 두면 일관된 UX.
 
 **동작**:
-- `data-back` 으로 돌아갈 때는 일반 슬라이드 (이 옵션은 forward 클릭만 즉시 swap).
-- 직접 `navigate(pageId, "left", { instant: true })` 호출도 가능.
+- 동일 속성으로 forward(`data-navigate`) 와 back(`data-back`) 양쪽 지원.
+- 직접 `navigate(pageId, dir, { instant: true })` 또는 `goBack({ instant: true })` 호출도 가능.
 
 ### 3-4) 슬라이드 메뉴(선택)
 
@@ -166,7 +170,7 @@ idle: {
 
 - `CONFIG.pages`에 있는 모든 페이지가 `#page-{id}`로 HTML에 존재한다.
 - `data-navigate` 값이 `CONFIG.pages`에 포함된 값만 사용한다.
-- 슬라이드 효과를 끄려는 트리거에는 `data-no-anim` 속성이 붙어있다 (필요 시).
+- 슬라이드 효과를 끄려는 트리거에는 `data-no-anim` 속성이 붙어있다 (data-navigate / data-back 둘 다 지원).
 - 슬라이드 메뉴를 켰다면 `#slide-menu*` 요소가 HTML에 존재한다.
 - Swiper/GSAP를 사용한다면 해당 스크립트가 `app.js`보다 먼저 로드된다.
 - `.spa-page` 전환 클래스들이 CSS에 정의되어 있다.
