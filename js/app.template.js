@@ -169,7 +169,16 @@
     return document.getElementById("page-" + pageId);
   }
 
-  function navigate(pageId, dir = "left") {
+  /**
+   * SPA page transition.
+   * @param pageId target page id
+   * @param dir    "left" (forward, default) | "right" (back)
+   * @param opts.instant  true → skip slide animation, swap pages immediately.
+   *                       Trigger via `data-no-anim` attribute on a [data-navigate] element.
+   *                       Useful for in-place state swaps (e.g. an alert variant of the same screen)
+   *                       where a slide transition would feel like leaving the current context.
+   */
+  function navigate(pageId, dir = "left", opts = {}) {
     if (isAnimating) return;
     if (!PAGES.includes(pageId)) return;
     if (pageId === current) return;
@@ -190,25 +199,33 @@
     }
 
     toEl.classList.remove("is-active", "is-leaving-left", "is-leaving-right", "is-entering-back");
-    if (dir === "right") toEl.classList.add("is-entering-back");
-    void toEl.offsetWidth;
 
-    if (fromEl) {
-      fromEl.classList.remove("is-active");
-      fromEl.classList.add(dir === "left" ? "is-leaving-left" : "is-leaving-right");
+    if (opts.instant) {
+      // No slide animation — swap active state directly.
+      if (fromEl) fromEl.classList.remove("is-active");
+      toEl.classList.add("is-active");
+      isAnimating = false;
+    } else {
+      if (dir === "right") toEl.classList.add("is-entering-back");
+      void toEl.offsetWidth;
+
+      if (fromEl) {
+        fromEl.classList.remove("is-active");
+        fromEl.classList.add(dir === "left" ? "is-leaving-left" : "is-leaving-right");
+      }
+
+      toEl.classList.remove("is-entering-back");
+      toEl.classList.add("is-active");
+
+      setTimeout(() => {
+        if (fromEl) fromEl.classList.remove("is-leaving-left", "is-leaving-right");
+        isAnimating = false;
+      }, CONFIG.transitionMs);
     }
-
-    toEl.classList.remove("is-entering-back");
-    toEl.classList.add("is-active");
 
     if (dir === "left" && current) historyStack.push(current);
     current = pageId;
     updateMenuActive(pageId);
-
-    setTimeout(() => {
-      if (fromEl) fromEl.classList.remove("is-leaving-left", "is-leaving-right");
-      isAnimating = false;
-    }, CONFIG.transitionMs);
 
     // onEnter() after page activation (good for animation/swiper update)
     const route = ROUTES[pageId];
@@ -330,7 +347,9 @@
       const navEl = e.target.closest("[" + CONFIG.nav.navigateAttr + "]");
       if (navEl) {
         e.preventDefault();
-        navigate(navEl.getAttribute(CONFIG.nav.navigateAttr), "left");
+        // `data-no-anim` flag on the trigger → skip slide transition (instant swap).
+        const instant = navEl.hasAttribute("data-no-anim");
+        navigate(navEl.getAttribute(CONFIG.nav.navigateAttr), "left", { instant });
         return;
       }
 
