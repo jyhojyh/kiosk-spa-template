@@ -243,6 +243,22 @@
     current = pageId;
     updateMenuActive(pageId);
 
+    // Video lifecycle — pause every <video> on the page being left and play (from start)
+    // every <video> on the page being entered. Without this, autoplay+loop videos on
+    // every page would all keep running in the background, wasting bandwidth and
+    // making re-entry resume mid-loop instead of starting fresh.
+    if (fromEl) {
+      fromEl.querySelectorAll("video").forEach((v) => {
+        try { v.pause(); } catch (e) {}
+      });
+    }
+    toEl.querySelectorAll("video").forEach((v) => {
+      try {
+        v.currentTime = 0;
+        v.play().catch(() => {}); // autoplay-policy blocks are non-fatal
+      } catch (e) {}
+    });
+
     // onEnter() after page activation (good for animation/swiper update)
     const route = ROUTES[pageId];
     if (route && typeof route.onEnter === "function") route.onEnter();
